@@ -43,5 +43,5 @@ def check_appointment():
     except Exception as e:
         send_message(f"HATA OLUŞTU:\n{e}")
 
-if _name_ == "_main_":
+if __name__ == "__main__":
     check_appointment()

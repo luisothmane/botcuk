@@ -1,10 +1,1 @@
-services:
-  - type: cron
-    name: randevu-bot
-    runtime: python
-    buildCommand: "pip install -r requirements.txt"
-    startCommand: "python main.py"
-    schedule: "*/10 * * * *"  # her 10 dakikada bir çalıştır
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.11
+

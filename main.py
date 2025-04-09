@@ -51,5 +51,5 @@ def check_appointment():
         send_message(f"HATA OLUŞTU:\n{e}")
 
 # Çalıştır
-if _name_ == "_main_":
+if __name__ == "__main__":
     check_appointment()

@@ -9,8 +9,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 # Telegram bilgileri
-TELEGRAM_TOKEN = "BOT_TOKENİNİ_BURAYA_YAZ"
-TELEGRAM_CHAT_ID = "CHAT_ID_BURAYA"
+TELEGRAM_TOKEN = "7001143599:AAHoOZYXycFQJ0rTl8z79DIK6DtP-E2oxio"
+TELEGRAM_CHAT_ID = "7392451982"
 
 bot = Bot(token=TELEGRAM_TOKEN)
 

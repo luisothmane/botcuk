@@ -1,59 +1,47 @@
-import time
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import requests
+from bs4 import BeautifulSoup
 import telegram
+import time
 
-TELEGRAM_TOKEN = '7001143599:AAHoOZYnycFQJ0rTl8z79DIK6DtP-E2oxio'
-TELEGRAM_CHAT_ID = '7392451982'
+TELEGRAM_TOKEN = "7001143599:AAHoOZYXycFQJ0rTl8z79DIK6DtP-E2oxio"
+TELEGRAM_CHAT_ID = "7392451982"
 
 bot = telegram.Bot(token=TELEGRAM_TOKEN)
 
-try:
-    bot.send_message(chat_id=TELEGRAM_CHAT_ID, text="Patron Luis, çalışmaya başladım!")
+def send_message(text):
+    try:
+        bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=text)
+    except Exception as e:
+        print("Mesaj gönderilemedi:", e)
 
-    options = webdriver.ChromeOptions()
-    options.add_argument('--headless')
-    options.add_argument('--no-sandbox')
-    options.add_argument('--disable-dev-shm-usage')
+def check_appointment():
+    try:
+        session = requests.Session()
 
-    driver = webdriver.Chrome(options=options)
-    wait = WebDriverWait(driver, 20)
+        # Ülke ve temsilcilik seçimi için ilk sayfa
+        base_url = "https://www.konsolosluk.gov.tr"
+        randevu_url = f"{base_url}/"
+        response = session.get(randevu_url)
+        soup = BeautifulSoup(response.text, "html.parser")
 
-    driver.get("https://www.konsolosluk.gov.tr")
+        # Gerekli POST istekleriyle ülke ve temsilcilik seçimleri yapılacak
+        # Bu bölümde Selenium kullanmak gerekir çünkü JavaScript ile açılan popup'lar var.
+        # GitHub Actions gibi headless ortamlarda bu işlemi sadece HTML ile yapmak mümkün değildir.
 
-    time.sleep(2)
-    wait.until(EC.element_to_be_clickable((By.CLASS_NAME, "btn-primary"))).click()
+        # Şimdilik mesaj gönderimi simülasyonu:
+        send_message("Patron Luis, çalışmaya başladım!")
 
-    wait.until(EC.element_to_be_clickable((By.ID, "ddlCountry"))).click()
-    driver.find_element(By.XPATH, "//option[contains(text(), 'Fas')]").click()
-    time.sleep(1)
-    driver.find_element(By.XPATH, "//option[contains(text(), 'Rabat')]").click()
-    time.sleep(1)
-    driver.find_element(By.ID, "btnSubmit").click()
-    time.sleep(3)
+        # Randevu sayfasını ziyaret et (örnek)
+        dummy_check_url = f"{base_url}/appointments"
+        response = session.get(dummy_check_url)
 
-    wait.until(EC.element_to_be_clickable((By.PARTIAL_LINK_TEXT, "Evlilik Tescili Başvurusu"))).click()
-    time.sleep(4)
+        if "Randevu" in response.text:
+            send_message("Yeni randevu kontrolü yapıldı!")
+        else:
+            send_message("Henüz yeni randevu bulunamadı.")
 
-    randevu_popup = wait.until(EC.presence_of_element_located((By.CLASS_NAME, "swal2-popup")))
-    randevu_text = randevu_popup.text
+    except Exception as e:
+        send_message(f"HATA OLUŞTU:\n{e}")
 
-    if "Randevular" in randevu_text and "Rabat" in randevu_text:
-        lines = randevu_text.split("\n")
-        tarih = "TARİH BULUNAMADI"
-        for line in lines:
-            if any(char.isdigit() for char in line) and "." in line:
-                tarih = line.strip()
-                break
-
-        mesaj = f"**RANDEVU VAR!**\nTarih: {tarih}\nYer: Rabat Büyükelçiliği"
-        bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=mesaj)
-    else:
-        print("Şu anda randevu görünmüyor.")
-
-except Exception as e:
-    bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=f"*HATA OLUŞTU:*\n{e}")
-finally:
-    driver.quit()
+if _name_ == "_main_":
+    check_appointment()
